@@ -29,19 +29,33 @@ async function connectToDB() {
 
     const cafeCollection = client.db("CafeUser").collection("users");
     const cafeMenu = client.db("CafeUser").collection("menu");
+    const cafeReviews = client.db("CafeUser").collection("reviews");
 
     app.get("/menu", async (req, res) => {
       try {
-        const data = cafeMenu.find(); // No need to assign to a variable if only chaining
-        const result = await data.toArray(); // Await the conversion to array
-        res.status(200).send(result); // Use status 200 to indicate a successful response
+        const data = cafeMenu.find();
+        const result = await data.toArray();
+        res.status(200).send(result);
       } catch (error) {
-        console.error("Error fetching menu data: ", error); // Log the error
-        res.status(500).send({ message: "Failed to retrieve menu" }); // Send a 500 status in case of server errors
+        console.error("Error fetching menu data: ", error); 
+        res.status(500).send({ message: "Failed to retrieve menu" }); 
       }
     });
 
-    // Send a ping to confirm a successful connection
+    
+
+    app.get("/reviews", async (req, res) => {
+      try {
+        const data = cafeReviews.find();
+        const result = await data.toArray();
+        res.status(200).send(result);
+      } catch (error) {
+        console.error("Error fetching reviews data: ", error); 
+        res.status(500).send({ message: "Failed to retrieve reviews" }); 
+      }
+    });
+
+    
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } catch (error) {
