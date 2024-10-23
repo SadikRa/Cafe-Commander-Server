@@ -56,6 +56,20 @@ async function connectToDB() {
       }
     });
 
+
+
+    app.get("/carts", async (req, res) => {
+      try {
+        const data = cafeCart.find();
+        const result = await data.toArray();
+        res.status(200).send(result);
+      } catch (error) {
+        console.error("Error fetching reviews data: ", error); 
+        res.status(500).send({ message: "Failed to retrieve reviews" }); 
+      }
+    });
+    
+
     app.post('/carts', async(req, res) => {
       const cartItem = req.body;
       const result = await cafeCart.insertOne(cartItem);
