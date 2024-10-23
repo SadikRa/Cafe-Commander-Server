@@ -59,14 +59,12 @@ async function connectToDB() {
 
 
     app.get("/carts", async (req, res) => {
-      try {
-        const data = cafeCart.find();
+        const email = req.query.email;
+        const query = {email: email}
+        const data = cafeCart.find(query);
         const result = await data.toArray();
         res.status(200).send(result);
-      } catch (error) {
-        console.error("Error fetching reviews data: ", error); 
-        res.status(500).send({ message: "Failed to retrieve reviews" }); 
-      }
+      
     });
     
 
