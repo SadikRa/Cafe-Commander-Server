@@ -26,10 +26,17 @@ async function connectToDB() {
     // Connect the client to the server
     await client.connect();
 
-    const cafeCollection = client.db("CafeUser").collection("users");
+    const userCollection = client.db("CafeUser").collection("users");
     const cafeMenu = client.db("CafeUser").collection("menu");
     const cafeReviews = client.db("CafeUser").collection("reviews");
     const cafeCart = client.db("CafeUser").collection("carts");
+
+
+    app.post('/user', async(req, res) => {
+      const user = req.body;
+      const result = await userCollection.insertOne(user);
+      res.send(result)
+    })
 
     app.get("/menu", async (req, res) => {
       try {
