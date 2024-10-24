@@ -3,7 +3,7 @@ const cors = require("cors");
 require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
-const { MongoClient, ServerApiVersion } = require("mongodb");
+const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
 
 app.use(cors());
 app.use(express.json());
@@ -11,7 +11,6 @@ app.use(express.json());
 // const uri = `mongodb+srv://${process.env.DBNAME}:${process.env.DBPASS}@cluster0.ywq3nhp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 const uri = `mongodb+srv://${process.env.SECRET_KEY_NAME}:${process.env.SECRET_KEY_PASSWORD}@cluster0.ywq3nhp.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
-
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri, {
@@ -38,12 +37,10 @@ async function connectToDB() {
         const result = await data.toArray();
         res.status(200).send(result);
       } catch (error) {
-        console.error("Error fetching menu data: ", error); 
-        res.status(500).send({ message: "Failed to retrieve menu" }); 
+        console.error("Error fetching menu data: ", error);
+        res.status(500).send({ message: "Failed to retrieve menu" });
       }
     });
-
-    
 
     app.get("/reviews", async (req, res) => {
       try {
@@ -51,31 +48,38 @@ async function connectToDB() {
         const result = await data.toArray();
         res.status(200).send(result);
       } catch (error) {
-        console.error("Error fetching reviews data: ", error); 
-        res.status(500).send({ message: "Failed to retrieve reviews" }); 
+        console.error("Error fetching reviews data: ", error);
+        res.status(500).send({ message: "Failed to retrieve reviews" });
       }
     });
 
-
+   
 
     app.get("/carts", async (req, res) => {
-        const email = req.query.email;
-        const query = {email: email}
-        const data = cafeCart.find(query);
-        const result = await data.toArray();
-        res.status(200).send(result);
-      
+      const email = req.query.email;
+      const query = { email: email };
+      const data = await cafeCart.find(query).toArray();
+      res.send(data);
     });
     
 
-    app.post('/carts', async(req, res) => {
+    app.post("/carts", async (req, res) => {
       const cartItem = req.body;
       const result = await cafeCart.insertOne(cartItem);
+      res.send(result);
+    });
+
+    app.delete('/carts/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id) }
+      const result  = await cafeCart.deleteOne(query);
       res.send(result)
     })
-    
+
     await client.db("admin").command({ ping: 1 });
-    console.log("Pinged your deployment. You successfully connected to MongoDB!");
+    console.log(
+      "Pinged your deployment. You successfully connected to MongoDB!"
+    );
   } catch (error) {
     console.error("Failed to connect to MongoDB:", error);
   }
