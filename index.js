@@ -31,12 +31,16 @@ async function connectToDB() {
     const cafeReviews = client.db("CafeUser").collection("reviews");
     const cafeCart = client.db("CafeUser").collection("carts");
 
-
-    app.post('/user', async(req, res) => {
+    app.post("/user", async (req, res) => {
       const user = req.body;
+      const query = { email: user.email };
+      const perviousUser = await userCollection.findOne(query);
+      if (perviousUser) {
+        return res.send("user already have account");
+      }
       const result = await userCollection.insertOne(user);
-      res.send(result)
-    })
+      res.send(result);
+    });
 
     app.get("/menu", async (req, res) => {
       try {
@@ -60,15 +64,12 @@ async function connectToDB() {
       }
     });
 
-   
-
     app.get("/carts", async (req, res) => {
       const email = req.query.email;
       const query = { email: email };
       const data = await cafeCart.find(query).toArray();
       res.send(data);
     });
-    
 
     app.post("/carts", async (req, res) => {
       const cartItem = req.body;
@@ -76,12 +77,12 @@ async function connectToDB() {
       res.send(result);
     });
 
-    app.delete('/carts/:id', async(req, res) => {
+    app.delete("/carts/:id", async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id) }
-      const result  = await cafeCart.deleteOne(query);
-      res.send(result)
-    })
+      const query = { _id: new ObjectId(id) };
+      const result = await cafeCart.deleteOne(query);
+      res.send(result);
+    });
 
     await client.db("admin").command({ ping: 1 });
     console.log(
