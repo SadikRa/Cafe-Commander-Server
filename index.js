@@ -42,6 +42,11 @@ async function connectToDB() {
       res.send(result);
     });
 
+    app.get('/users', async(req, res) => {
+      const users = await userCollection.find().toArray();
+      res.send(users)
+    })
+
     app.get("/menu", async (req, res) => {
       try {
         const data = cafeMenu.find();
