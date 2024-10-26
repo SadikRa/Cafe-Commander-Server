@@ -54,6 +54,18 @@ async function connectToDB() {
       res.send(result)
     })
 
+    app.patch('/users/admin/:id', async(req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)};
+      const updateDoc = {
+        $set: {
+          role: 'admin'
+        }
+      }
+      const result = await userCollection.updateOne(query, updateDoc);
+      res.send(result)
+    })
+
     app.get("/menu", async (req, res) => {
       try {
         const data = cafeMenu.find();
