@@ -4,6 +4,7 @@ require("dotenv").config();
 const app = express();
 const port = process.env.PORT || 5000;
 const { MongoClient, ServerApiVersion, ObjectId } = require("mongodb");
+var jwt = require('jsonwebtoken');
 
 app.use(cors());
 app.use(express.json());
@@ -31,6 +32,14 @@ async function connectToDB() {
     const cafeReviews = client.db("CafeUser").collection("reviews");
     const cafeCart = client.db("CafeUser").collection("carts");
 
+    app.post("/jwt", async (req, res) => {
+      const user = req.body;
+      const token = jwt.sign(user, process.env.ACCESS_TOKEN_SECRET, {
+        expiresIn: "1h",
+      });
+      res.send({ token });
+    });
+
     app.post("/user", async (req, res) => {
       const user = req.body;
       const query = { email: user.email };
@@ -42,29 +51,29 @@ async function connectToDB() {
       res.send(result);
     });
 
-    app.get('/users', async(req, res) => {
+    app.get("/users", async (req, res) => {
       const users = await userCollection.find().toArray();
-      res.send(users)
-    })
+      res.send(users);
+    });
 
-    app.delete('/users/:id', async(req, res) => {
+    app.delete("/users/:id", async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)};
+      const query = { _id: new ObjectId(id) };
       const result = await userCollection.deleteOne(query);
-      res.send(result)
-    })
+      res.send(result);
+    });
 
-    app.patch('/users/admin/:id', async(req, res) => {
+    app.patch("/users/admin/:id", async (req, res) => {
       const id = req.params.id;
-      const query = {_id: new ObjectId(id)};
+      const query = { _id: new ObjectId(id) };
       const updateDoc = {
         $set: {
-          role: 'admin'
-        }
-      }
+          role: "admin",
+        },
+      };
       const result = await userCollection.updateOne(query, updateDoc);
-      res.send(result)
-    })
+      res.send(result);
+    });
 
     app.get("/menu", async (req, res) => {
       try {
